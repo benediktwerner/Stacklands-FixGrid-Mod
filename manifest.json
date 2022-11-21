@@ -1,7 +1,7 @@
 {
   "name": "FixGrid",
   "description": "Make grid always align with map size",
-  "version_number": "1.0.0",
+  "version_number": "1.0.1",
   "dependencies": ["BepInEx-BepInExPack_Stacklands-5.4.2100"],
   "website_url": "https://github.com/benediktwerner/Stacklands-FixGrid-Mod"
 }

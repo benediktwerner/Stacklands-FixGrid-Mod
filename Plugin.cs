@@ -1,51 +1,89 @@
-﻿using BepInEx;
+﻿using System;
+using System.Collections.Generic;
+using System.Reflection.Emit;
+using BepInEx;
 using BepInEx.Configuration;
+using BepInEx.Logging;
 using HarmonyLib;
+using UnityEngine;
 
 namespace FixGrid
 {
-    [BepInPlugin(
-        "de.benediktwerner.stacklands.fixgrid",
-        PluginInfo.PLUGIN_NAME,
-        PluginInfo.PLUGIN_VERSION
-    )]
+    [BepInPlugin("de.benediktwerner.stacklands.fixgrid", PluginInfo.PLUGIN_NAME, PluginInfo.PLUGIN_VERSION)]
     public class Plugin : BaseUnityPlugin
     {
+        public static ManualLogSource L;
         public static ConfigEntry<float> MinGridWidth;
         public static ConfigEntry<float> MinGridHeight;
+        public static ConfigEntry<bool> AlignIslandGrid;
 
         private void Awake()
         {
-            MinGridWidth = Config.Bind(
+            L = Logger;
+
+            MinGridWidth = Config.Bind("General", "Minimum Grid Cell Width", 0.7f, "Vanilla is 0.75");
+            MinGridHeight = Config.Bind("General", "Minimum Grid Cell Height", 0.85f, "Vanilla is 0.85");
+            AlignIslandGrid = Config.Bind(
                 "General",
-                "Minimum Grid Cell Width",
-                0.7f,
-                "Vanilla is 0.75"
-            );
-            MinGridHeight = Config.Bind(
-                "General",
-                "Minimum Grid Cell Height",
-                0.85f,
-                "Vanilla is 0.85"
+                "Align Island Grid",
+                true,
+                "This fixes grid alignemnt on the island but as a trade-off disables the visible grid there since it can't be aligned properly"
             );
 
             Harmony.CreateAndPatchAll(typeof(Plugin));
         }
 
-        [HarmonyPatch(typeof(WorldManager), nameof(WorldManager.Update))]
-        [HarmonyPrefix]
-        public static void FixGridSize(WorldManager __instance)
+        public static void SnapCardsToGrid(WorldManager instance)
         {
-            if (__instance.CurrentBoard == null)
-                return;
+            if (instance.CurrentBoard.Id != "island" || !AlignIslandGrid.Value)
+                instance.gridAlpha = 1f;
 
-            var width = __instance.CurrentBoard.WorldBounds.extents.x - 0.5f;
+            var bounds = instance.CurrentBoard.WorldBounds;
+
+            var width = bounds.extents.x - 0.5f;
             var xCount = (int)(width / MinGridWidth.Value);
-            __instance.GridWidth = width / xCount;
+            instance.GridWidth = width / xCount;
 
-            var height = __instance.CurrentBoard.WorldBounds.extents.z - 0.5f;
+            var height = bounds.extents.z - 0.5f;
             var zCount = (int)(height / MinGridHeight.Value);
-            __instance.GridHeight = height / zCount;
+            instance.GridHeight = height / zCount;
+
+            var xOffset = AlignIslandGrid.Value ? bounds.center.x : 0;
+            var zOffset = AlignIslandGrid.Value ? bounds.center.z : 0;
+
+            foreach (GameCard gameCard in instance.AllCards)
+            {
+                if (gameCard.Parent == null && gameCard.CardData is not Mob && gameCard.MyBoard.IsCurrent)
+                {
+                    var position = gameCard.transform.position;
+                    position.x =
+                        (float)Mathf.RoundToInt((position.x - xOffset) / instance.GridWidth) * instance.GridWidth
+                        + xOffset;
+                    position.z =
+                        (float)Mathf.RoundToInt((position.z - zOffset) / instance.GridHeight) * instance.GridHeight
+                        + zOffset;
+                    gameCard.TargetPosition = position;
+                }
+            }
+        }
+
+        [HarmonyPatch(typeof(WorldManager), nameof(WorldManager.Update))]
+        [HarmonyTranspiler]
+        public static IEnumerable<CodeInstruction> CircumventSnapCardsToGridInline(
+            IEnumerable<CodeInstruction> instructions
+        )
+        {
+            return new CodeMatcher(instructions)
+                .MatchForward(
+                    false,
+                    new CodeMatch(
+                        OpCodes.Call,
+                        AccessTools.Method(typeof(WorldManager), nameof(WorldManager.SnapCardsToGrid))
+                    )
+                )
+                .ThrowIfInvalid("Didn't find SnapCardsToGrid call")
+                .SetOperandAndAdvance(AccessTools.Method(typeof(Plugin), nameof(Plugin.SnapCardsToGrid)))
+                .InstructionEnumeration();
         }
     }
 }
