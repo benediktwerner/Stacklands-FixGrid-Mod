@@ -14,13 +14,15 @@ correct position. If you prefer, you can instead turn the alignment fix off for 
 size will still be adjusted according to the configuration but the grid won't be perfectly aligned to the edge of the board.
 
 ## Manual Installation
+
 This mod requires BepInEx to work. BepInEx is a modding framework which allows multiple mods to be loaded.
 
 1. Download and install BepInEx from the [Thunderstore](https://stacklands.thunderstore.io/package/BepInEx/BepInExPack_Stacklands/).
-4. Download this mod and extract it into `BepInEx/plugins/`
-5. Launch the game
+2. Download this mod and extract it into `BepInEx/plugins/`
+3. Launch the game
 
 ## Development
+
 1. Install BepInEx
 2. This mod uses publicized game DLLs to get private members without reflection
    - Use https://github.com/CabbageCrow/AssemblyPublicizer for example to publicize `Stacklands/Stacklands_Data/Managed/GameScripts.dll` (just drag the DLL onto the publicizer exe)
@@ -30,11 +32,14 @@ This mod requires BepInEx to work. BepInEx is a modding framework which allows m
    - If you're using VSCode, the `.vscode/tasks.json` file should make it so that you can just do `Run Build`/`Ctrl+Shift+B` to build.
 
 ## Links
+
 - Github: https://github.com/benediktwerner/Stacklands-FixGrid-Mod
 - Thunderstore: https://stacklands.thunderstore.io/package/benediktwerner/FixGrid
 
 ## Changelog
 
+- v1.0.2:
+  - Compatibility with OffGrid and ToggleGrid mods
 - v1.0.1:
   - Only snap cards on current board to grid
   - Fix island grid alignment (requires hiding the grid there, can be turned off in the config)
