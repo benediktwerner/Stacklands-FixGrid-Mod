@@ -13,31 +13,20 @@ On the island, the visible grid can't easily be made to align properly so it wil
 correct position. If you prefer, you can instead turn the alignment fix off for the island in the config. In that case, the grid
 size will still be adjusted according to the configuration but the grid won't be perfectly aligned to the edge of the board.
 
-## Manual Installation
-
-This mod requires BepInEx to work. BepInEx is a modding framework which allows multiple mods to be loaded.
-
-1. Download and install BepInEx from the [Thunderstore](https://stacklands.thunderstore.io/package/BepInEx/BepInExPack_Stacklands/).
-2. Download this mod and extract it into `BepInEx/plugins/`
-3. Launch the game
-
 ## Development
 
-1. Install BepInEx
-2. This mod uses publicized game DLLs to get private members without reflection
-   - Use https://github.com/CabbageCrow/AssemblyPublicizer for example to publicize `Stacklands/Stacklands_Data/Managed/GameScripts.dll` (just drag the DLL onto the publicizer exe)
-   - This outputs to `Stacklands_Data\Managed\publicized_assemblies\GameScripts_publicized.dll` (if you use another publicizer, place the result there)
-3. Compile the project. This copies the resulting DLL into `<GAME_PATH>/BepInEx/plugins/`.
-   - Your `GAME_PATH` should automatically be detected. If it isn't, you can manually set it in the `.csproj` file.
-   - If you're using VSCode, the `.vscode/tasks.json` file should make it so that you can just do `Run Build`/`Ctrl+Shift+B` to build.
+- Build using `dotnet build`
+- For release builds, add `-c Release`
+- If you're using VSCode, the `.vscode/tasks.json` file allows building via `Run Build`/`Ctrl+Shift+B`
 
 ## Links
 
 - Github: https://github.com/benediktwerner/Stacklands-FixGrid-Mod
-- Thunderstore: https://stacklands.thunderstore.io/package/benediktwerner/FixGrid
+- Steam Workshop: https://steamcommunity.com/sharedfiles/filedetails/?id=3012092960
 
 ## Changelog
 
+- v1.1.0: Steam Workshop Support
 - v1.0.2:
   - Compatibility with OffGrid and ToggleGrid mods
 - v1.0.1:

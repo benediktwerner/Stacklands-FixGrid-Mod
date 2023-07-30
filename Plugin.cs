@@ -1,33 +1,38 @@
-﻿using BepInEx;
-using BepInEx.Configuration;
-using BepInEx.Logging;
-using HarmonyLib;
+﻿using HarmonyLib;
 using UnityEngine;
 
 namespace FixGrid
 {
-    [BepInPlugin("de.benediktwerner.stacklands.fixgrid", PluginInfo.PLUGIN_NAME, PluginInfo.PLUGIN_VERSION)]
-    public class Plugin : BaseUnityPlugin
+    public class Plugin : Mod
     {
-        public static ManualLogSource L;
+        public static ModLogger L;
         public static ConfigEntry<float> MinGridWidth;
         public static ConfigEntry<float> MinGridHeight;
         public static ConfigEntry<bool> AlignIslandGrid;
+
+        private ConfigEntry<T> CreateConfig<T>(string name, T defaultValue, string description)
+        {
+            return Config.GetEntry<T>(name, defaultValue, new ConfigUI { Tooltip = description });
+        }
 
         private void Awake()
         {
             L = Logger;
 
-            MinGridWidth = Config.Bind("General", "Minimum Grid Cell Width", 0.7f, "Vanilla is 0.75");
-            MinGridHeight = Config.Bind("General", "Minimum Grid Cell Height", 0.85f, "Vanilla is 0.85");
-            AlignIslandGrid = Config.Bind(
-                "General",
+            MinGridWidth = CreateConfig("Minimum Grid Cell Width", 0.7f, "Vanilla is 0.75");
+            MinGridHeight = CreateConfig("Minimum Grid Cell Height", 0.85f, "Vanilla is 0.85");
+            AlignIslandGrid = CreateConfig(
                 "Align Island Grid",
                 true,
                 "This fixes grid alignment on the island but as a trade-off disables the visible grid there since it can't be aligned properly"
             );
 
-            Harmony.CreateAndPatchAll(typeof(Plugin));
+            Harmony.PatchAll(typeof(Plugin));
+        }
+
+        public void OnDestroy()
+        {
+            Harmony.UnpatchSelf();
         }
 
         [HarmonyPatch(typeof(WorldManager), "SnapCardsToGrid")]
@@ -62,7 +67,8 @@ namespace FixGrid
                     && gameCard.MyBoard.IsCurrent
                     && !gameCard.BeingDragged
                     && (!gameCard.Velocity.HasValue || gameCard.Velocity.Value.magnitude < 0.01)
-                ) {
+                )
+                {
                     var position = gameCard.transform.position;
                     position.x =
                         (float)Mathf.RoundToInt((position.x - xOffset) / __instance.GridWidth) * __instance.GridWidth
