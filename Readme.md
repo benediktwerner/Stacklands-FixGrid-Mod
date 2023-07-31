@@ -6,8 +6,7 @@ meaning you'll never have cards trying to align into the wall and jump around be
 Specifically, it increases the space between cards in the grid if necessary to make it align.
 
 It also adds configuration options for the minimum size of the grid and by default slightly decreases the minimal horizontal distance between
-cards. You can change the configuration via the Mod Manager or by editing the `BepInEx/config/de.benediktwerner.stacklands.FixGrid.cfg` file
-which will be generated after starting the game with the mod installed for the first time.
+cards.
 
 On the island, the visible grid can't easily be made to align properly so it will be hidden. The cards will still align to the
 correct position. If you prefer, you can instead turn the alignment fix off for the island in the config. In that case, the grid
@@ -26,6 +25,7 @@ size will still be adjusted according to the configuration but the grid won't be
 
 ## Changelog
 
+- v1.1.1: Don't unpatch when exiting the game
 - v1.1.0: Steam Workshop Support
 - v1.0.2:
   - Compatibility with OffGrid and ToggleGrid mods

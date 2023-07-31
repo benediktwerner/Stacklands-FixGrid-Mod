@@ -30,11 +30,6 @@ namespace FixGrid
             Harmony.PatchAll(typeof(Plugin));
         }
 
-        public void OnDestroy()
-        {
-            Harmony.UnpatchSelf();
-        }
-
         [HarmonyPatch(typeof(WorldManager), "SnapCardsToGrid")]
         [HarmonyAfter("OffGridPlugin")]
         [HarmonyBefore("GridTogglePlugin")]
