@@ -25,6 +25,7 @@ size will still be adjusted according to the configuration but the grid won't be
 
 ## Changelog
 
+- v1.1.2: Compatibility with the "Stacklands 2000" DLC
 - v1.1.1: Don't unpatch when exiting the game
 - v1.1.0: Steam Workshop Support
 - v1.0.2:
